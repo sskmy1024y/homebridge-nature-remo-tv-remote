@@ -10,8 +10,7 @@
 </div>
 
 <div align="center">
-  <strong>This plugin add the TV remote control registered in Nature Remo to homebridge</strong>
-  <p><a href="https://github.com/sskmy1024y/homebridge-nature-remo-tv-remote/blob/main/README.ja.md">🇯🇵 Japanese</a></p>
+  <strong>Nature Remoに登録したテレビリモコンをhomebridgeに追加します</strong>
 </div>
 
 <div align="center">
@@ -20,30 +19,30 @@
 
 
 
-## 📲 Installation
+## 📲 インストール
 
-Go to the "Plugins" tab in [config-ui-x](https://github.com/oznu/homebridge-config-ui-x) and search for `homebridge-nature-remo-tv-remote`, or use the following command to install it.
+[config-ui-x](https://github.com/oznu/homebridge-config-ui-x)の「プラグイン」タブから`homebridge-nature-remo-tv-remote`で検索、もしくは下記のコマンドでインストールしてください。
+
 
 ```sh
 npm i -g homebridge-nature-remo-tv-remote
 ```
 
-## ✅ Customize devices
+## ✅ デバイスの設定
 
-### 1. Get Nature-Remo OAuth2 Access Token
+### 1. Nature RemoのOAuth2アクセストークンを取得
 
-Issue at https://home.nature.global/
+[こちら](https://home.nature.global/)からアクセストークンを取得します。
 
-### 2. Get the Appliance ID of your TV.
+### 2. 登録するテレビのAppliance IDを取得
 
-Open a terminal and execute the following command.  
-In `${access-token}`, put the token you got in step 1.
+ターミナルを開き、下記のコマンドを実行してください。`${access-token}`には、1.で取得したトークンを入れてください。
 
 ```sh
 curl -X GET "https://api.nature.global/1/appliances" -H "Authorization: Bearer ${access-token}" > appliance_id.json
 ```
 
-Open the saved `appliance_id.json` and check the Appliance ID.
+保存された`appliance_id.json`を開いて、Appliance IDを確認してください。
 
 ```json
 {
@@ -52,7 +51,7 @@ Open the saved `appliance_id.json` and check the Appliance ID.
     "device": {...},
     "model": null,
     "type": "TV",
-    "nickname": "テレビ", // <- Names registered in NatureRemo
+    "nickname": "テレビ", // <- NatureRemoに登録されている名前
     "image": "ico_tv",
     "settings": null,
     "aircon": null,
@@ -63,25 +62,23 @@ Open the saved `appliance_id.json` and check the Appliance ID.
 }
 ```
 
-### 3. Sign up for homebridge.
+### 3. homebridgeに登録する
 
-Using [config-ui-x](https://github.com/oznu/homebridge-config-ui-x), you can easily add a configuration.  
-Open the "homebridge-nature-remo-tv-remote" configuration from the "Plugins" tab, and enter the access token and Appliance ID obtained in steps 1 and 2.
+[config-ui-x](https://github.com/oznu/homebridge-config-ui-x)を使用すると、簡単に設定を追加できます。  
+「プラグイン」タブから「homebridge-nature-remo-tv-remote」の設定を開き、1.,2.で取得したアクセストークンとAppliance IDを入力します。
 
-After pressing "Save", restart homebridge.
+「保存」を押した後、homebridgeを再起動してください。
 
 <img src="https://user-images.githubusercontent.com/16918590/116787692-8672d180-aae0-11eb-94fd-603e530c57ce.png" alt="homebridge setting" width="640px" />
 
 
-## 🏠 Add TV's to home app
+## 🏠 Homeアプリへ追加
 
-Even if you have already added homebridge as a bridge, you will need to add a new one.
+既にhomebridgeをブリッジとして追加している場合でも、新しく追加する必要があります。
 
-1. Open the Home App
-2. Type + in the top right corner to add a device
-3. Then click on Don't Have a Code or Can't scan?
-4. The found TV should appear under Nearby Accessories ... click on it
-5. Use the pin that you configured under config > bridge > pin or check the config-ui-x
+Home.appを開き、「アクセサリを追加」→「コードがないか、スキャンできません」→（追加したテレビを選択）→「このまま追加」を押してください。
+
+HomeKit設定コードは、[config-ui-x](https://github.com/oznu/homebridge-config-ui-x)から確認できます。
 
 <img width="680px" src="https://user-images.githubusercontent.com/16918590/116788425-752bc400-aae4-11eb-8233-e68967cc585b.png" alt="add-homeapp-step" />
 

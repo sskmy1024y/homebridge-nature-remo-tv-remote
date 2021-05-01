@@ -1,0 +1,137 @@
+{
+  "pluginAlias": "NatureRemoTVRemote",
+  "pluginType": "platform",
+  "singular": false,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Room TV",
+        "required": true
+      },
+      "access_token": {
+        "title": "Access token",
+        "type": "string",
+        "required": true
+      },
+      "appliance_id": {
+        "title": "Appliance ID",
+        "type": "string",
+        "required": true
+      },
+      "sources": {
+        "type": "array",
+        "description": "Set the input source for the TV.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "title": "Label",
+              "type": "string",
+              "placeholder": "Enter source name (ex. 'HDMI1')",
+              "required": true
+            },
+            "button": {
+              "title": "Button Name",
+              "type": "string",
+              "placeholder": "Enter button name from nature remo",
+              "required": true
+            }
+          }
+        }
+      },
+      "allow_up": {
+        "title": "Allow up",
+        "type": "string",
+        "placeholder": "up"
+      },
+      "allow_down": {
+        "title": "Allow down",
+        "type": "string",
+        "placeholder": "down"
+      },
+      "allow_left": {
+        "title": "Allow left",
+        "type": "string",
+        "placeholder": "left"
+      },
+      "allow_right": {
+        "title": "Allow right",
+        "type": "string",
+        "placeholder": "right"
+      },
+      "select": {
+        "title": "Select button",
+        "type": "string",
+        "placeholder": "ok"
+      },
+      "back": {
+        "title": "Back button",
+        "type": "string",
+        "placeholder": "back"
+      },
+      "pause_resume": {
+        "title": "Pause/Resume",
+        "type": "string",
+        "placeholder": ""
+      },
+      "information": {
+        "title": "Information",
+        "type": "string",
+        "placeholder": "display"
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "items": [
+        "name",
+        "access_token",
+        "appliance_id"
+      ]
+    },
+    {
+      "key": "sources",
+      "type": "array",
+      "expandable": true,
+      "orderable": true,
+      "buttonText": "Add input source",
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": [
+            "sources[].label",
+            "sources[].button"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "keymap",
+      "type": "fieldset",
+      "expandable": true,
+      "title": "Key maps",
+      "description": "Assign any button in nature remo to on the remote control.",
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": [
+            "allow_up",
+            "allow_down",
+            "allow_left",
+            "allow_right",
+            "select",
+            "back",
+            "pause_resume",
+            "information"
+          ]
+        }
+      ]
+    }
+  ]
+}
