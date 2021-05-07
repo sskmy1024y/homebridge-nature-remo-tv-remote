@@ -1,6 +1,6 @@
 {
   "name": "homebridge-nature-remo-tv-remote",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This plugin add the TV remote control registered in Nature Remo to homebridge",
   "author": "sskmy1024y",
   "license": "MIT",
