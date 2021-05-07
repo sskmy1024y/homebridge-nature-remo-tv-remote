@@ -156,15 +156,17 @@ class NatureRemoTVRemote {
      * is sent to the TV Service ActiveIdentifier Characteristic handler.
      */
 
-    this.config.sources.map((src, index) => {
-      const inputService = this.tvAccessory.addService(this.Service.InputSource, src.label, src.label);
-      inputService
-        .setCharacteristic(this.Characteristic.Identifier, index + 1)
-        .setCharacteristic(this.Characteristic.ConfiguredName, src.label)
-        .setCharacteristic(this.Characteristic.IsConfigured, this.Characteristic.IsConfigured.CONFIGURED)
-        .setCharacteristic(this.Characteristic.InputSourceType, this.Characteristic.InputSourceType.HDMI);
-      tvService.addLinkedService(inputService); // link to tv service
-    })
+    if (this.config.sources && this.config.sources.length > 0) {
+      this.config.sources.map((src, index) => {
+        const inputService = this.tvAccessory.addService(this.Service.InputSource, src.label, src.label);
+        inputService
+          .setCharacteristic(this.Characteristic.Identifier, index + 1)
+          .setCharacteristic(this.Characteristic.ConfiguredName, src.label)
+          .setCharacteristic(this.Characteristic.IsConfigured, this.Characteristic.IsConfigured.CONFIGURED)
+          .setCharacteristic(this.Characteristic.InputSourceType, this.Characteristic.InputSourceType.HDMI);
+        tvService.addLinkedService(inputService); // link to tv service
+      })
+    }
 
 
     /**
