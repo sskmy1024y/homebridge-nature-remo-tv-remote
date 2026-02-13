@@ -17,24 +17,69 @@ class NatureRemoTVRemote {
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
 
+    // cached accessories from Homebridge
+    this.cachedAccessories = [];
+
+    // wait for the "didFinishLaunching" event to set up accessories
+    this.api.on('didFinishLaunching', () => {
+      this.setupAccessory();
+    });
+  }
+
+  /**
+   * Called by Homebridge to restore cached accessories from disk.
+   */
+  configureAccessory(accessory) {
+    this.log.debug('Restoring cached accessory:', accessory.displayName);
+    this.cachedAccessories.push(accessory);
+  }
+
+  setupAccessory() {
     // get the name
     const tvName = this.config.name || 'Nature Remo TV';
 
     // generate a UUID
     const uuid = this.api.hap.uuid.generate(`homebridge:${PLUGIN_NAME}` + tvName);
 
-    // create the accessory
-    this.tvAccessory = new api.platformAccessory(tvName, uuid);
+    // check if the accessory was already cached
+    const existingAccessory = this.cachedAccessories.find(acc => acc.UUID === uuid);
 
-    // set the accessory category
-    this.tvAccessory.category = this.api.hap.Categories.TELEVISION;
+    if (existingAccessory) {
+      // use the cached accessory
+      this.log.debug('Restoring existing accessory from cache:', tvName);
+      this.tvAccessory = existingAccessory;
+      this.tvAccessory.category = this.api.hap.Categories.TELEVISION;
+      this.configureServices();
+    } else {
+      // create a new accessory
+      this.log.debug('Adding new accessory:', tvName);
+      this.tvAccessory = new this.api.platformAccessory(tvName, uuid);
+      this.tvAccessory.category = this.api.hap.Categories.TELEVISION;
+      this.configureServices();
 
+      // register the new accessory with Homebridge
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [this.tvAccessory]);
+    }
 
+    // remove any stale cached accessories that no longer match
+    const staleAccessories = this.cachedAccessories.filter(acc => acc.UUID !== uuid);
+    if (staleAccessories.length > 0) {
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, staleAccessories);
+    }
+  }
+
+  configureServices() {
     /***********************************************************************************
     *********************************   TV Service   ***********************************
     /***********************************************************************************/
 
-    const tvService = this.tvAccessory.addService(this.Service.Television);
+    // get or add the Television service
+    let tvService = this.tvAccessory.getService(this.Service.Television);
+    if (!tvService) {
+      tvService = this.tvAccessory.addService(this.Service.Television);
+    }
+
+    const tvName = this.config.name || 'Nature Remo TV';
 
     // set the tv name
     tvService.setCharacteristic(this.Characteristic.ConfiguredName, tvName);
@@ -44,7 +89,7 @@ class NatureRemoTVRemote {
 
     // handle on / off events using the Active characteristic
     tvService.getCharacteristic(this.Characteristic.Active)
-      .onSet((newValue) => {        
+      .onSet((newValue) => {
         const prevState = tvService.getCharacteristic(this.Characteristic.Active).value
         if (prevState !== newValue) {
           this.log.debug(`> [Power]: ${newValue ? 'On' : 'Off'}`);
@@ -136,7 +181,10 @@ class NatureRemoTVRemote {
      * Create a speaker service to allow volume control
      */
 
-    const speakerService = this.tvAccessory.addService(this.Service.TelevisionSpeaker);
+    let speakerService = this.tvAccessory.getService(this.Service.TelevisionSpeaker);
+    if (!speakerService) {
+      speakerService = this.tvAccessory.addService(this.Service.TelevisionSpeaker);
+    }
 
     speakerService
       .setCharacteristic(this.Characteristic.Active, this.Characteristic.Active.ACTIVE)
@@ -156,6 +204,11 @@ class NatureRemoTVRemote {
      * is sent to the TV Service ActiveIdentifier Characteristic handler.
      */
 
+    // remove old input source services before re-adding (for cached accessories)
+    this.tvAccessory.services
+      .filter(s => s instanceof this.Service.InputSource)
+      .forEach(s => this.tvAccessory.removeService(s));
+
     if (this.config.sources && this.config.sources.length > 0) {
       this.config.sources.map((src, index) => {
         const inputService = this.tvAccessory.addService(this.Service.InputSource, src.label, src.label);
@@ -167,14 +220,6 @@ class NatureRemoTVRemote {
         tvService.addLinkedService(inputService); // link to tv service
       })
     }
-
-
-    /**
-     * Publish as external accessory
-     * Only one TV can exist per bridge, to bypass this limitation, you should
-     * publish your TV as an external accessory.
-     */
-    this.api.publishExternalAccessories(PLUGIN_NAME, [this.tvAccessory]);
   }
 
   async setOnCharacteristicHandler(button) {
